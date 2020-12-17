@@ -56,15 +56,12 @@ This function should only modify configuration layer settings."
      ;; To have auto-completion on as soon as you start typing
      ;; (auto-completion :variables auto-completion-idle-delay nil)
 
-     ;; Enable clj-refactor tools
+     ;; https://develop.spacemacs.org/layers/+lang/clojure/README.html
      (clojure :variables
               clojure-toplevel-inside-comment-form t
               cider-overlays-use-font-lock t
               clojure-enable-linters 'clj-kondo
-              cider-test-show-report-on-success t)
-
-     ;; To add the sayid debugger, include the following as a variable above
-     ;; clojure-enable-sayid t
+              cider-preferred-build-tool 'clojure-cli)
 
      ;; SPC a L displays key and command history in a separate buffer
      command-log
@@ -107,11 +104,11 @@ This function should only modify configuration layer settings."
      ;; (gtags :variables
      ;;        gtags-enable-by-default t)
 
-     helm
-     ;; (helm :variables
-     ;;       helm-enable-auto-resize t
-     ;;       helm-position 'top  ; top, bottom, left, right
-     ;;       helm-use-frame-when-more-than-two-windows nil)
+     ;; helm-follow-mode sticky - remembers use of C-c C-f
+     ;; - follow mode previews when scrolling through a helm list
+     ;; (setq helm-follow-mode-persistent t)
+     (helm :variables
+           helm-follow-mode-persistent t)
 
      html
      ;; javascript
@@ -126,10 +123,16 @@ This function should only modify configuration layer settings."
      ;; `g r' menu in Emacs normal state
      multiple-cursors
 
-     ;; Customise the Spacemacs themes
-     ;; https://develop.spacemacs.org/layers/+themes/theming/README.html
-     ;; See example code in dotspacemacs/user-init
-     ;; theming
+     ;; Configuration: https://github.com/seagle0128/doom-modeline#customize
+     (spacemacs-modeline :variables
+                         doom-modeline-height 12
+                         doom-modeline-major-mode-color-icon t
+                         doom-modeline-buffer-file-name-style 'relative-to-project
+                         doom-modeline-display-default-persp-name t
+                         doom-modeline-minor-modes nil
+                         doom-modeline-modal-icon nil)
+
+     ;; buffer-position word-count parrot selection-info
 
      ;; Spacemacs Org mode
      (org :variables
@@ -187,12 +190,25 @@ This function should only modify configuration layer settings."
                treemacs-use-filewatch-mode t
                treemacs-use-follow-mode t)
 
+     ;; Customise the Spacemacs themes
+     ;; https://develop.spacemacs.org/layers/+themes/theming/README.html
+     ;; Code in dotspacemacs/user-init to reduce size of modeline
+     ;; theming
+
+     ;; Support font ligatures (fancy symbols) in all modes
+     ;; 'prog-mode for only programming languages
+     ;; including text-mode may cause issues with org-mode and magit
+     (unicode-fonts :variables
+                    unicode-fonts-enable-ligatures t
+                    unicode-fonts-ligature-modes '(prog-mode))
+
      ;; Highlight changes in buffers
      ;; SPC g . transient state for navigating changes
      (version-control :variables
                       version-control-diff-tool 'diff-hl
                       version-control-global-margin t)
 
+     yaml
 
      ) ;; End of dotspacemacs-configuration-layers
 
@@ -312,7 +328,7 @@ It should only modify the values of Spacemacs settings."
    ;; directory. A string value must be a path to an image format supported
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
-   dotspacemacs-startup-banner 'official
+   dotspacemacs-startup-banner "~/.spacemacs.d/banners/practicalli-logo.svg"
 
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
@@ -361,8 +377,8 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-colorize-cursor-according-to-state t
 
    ;; Default font or prioritized list of fonts.
-   dotspacemacs-default-font '("Ubuntu Mono"
-                               :size 12.0
+   dotspacemacs-default-font '("Fira Code"
+                               :size 16.0
                                :weight normal
                                :width normal)
 
@@ -598,6 +614,13 @@ It should only modify the values of Spacemacs settings."
    ;; (default t)
    dotspacemacs-use-clean-aindent-mode t
 
+   ;; If non-nil shift your number row to match the entered keyboard layout
+   ;; (only in insert mode). Currently the keyboard layouts
+   ;; (qwerty-us qwertz-de) are supported.
+   ;; New layouts can be added in `spacemacs-editing' layer.
+   ;; (default nil)
+   dotspacemacs-swap-number-row nil
+
    ;; Either nil or a number of seconds. If non-nil zone out after the specified
    ;; number of seconds. (default nil)
    dotspacemacs-zone-out-when-idle nil
@@ -605,7 +628,11 @@ It should only modify the values of Spacemacs settings."
    ;; Run `spacemacs/prettify-org-buffer' when
    ;; visiting README.org files of Spacemacs.
    ;; (default nil)
-   dotspacemacs-pretty-docs t))
+   dotspacemacs-pretty-docs t
+
+   ;; If nil the home buffer shows the full path of agenda items
+   ;; and todos. If non nil only the file name is shown.
+   dotspacemacs-home-shorten-agenda-source nil))
 
 (defun dotspacemacs/user-env ()
   "Environment variables setup.
@@ -624,14 +651,17 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
 
   ;; custom theme modification
   ;; - overriding default height of modeline
-  ;; (setq-default
-  ;;   theming-modifications
-  ;;     '((spacemacs-light
-  ;;         (mode-line :height 0.92)
-  ;;         (mode-line-inactive :height 0.92))
-  ;;       (doom-solarized-light
-  ;;        (mode-line :height 0.92)
-  ;;        (mode-line-inactive :height 0.92))))
+  (setq-default
+    theming-modifications
+      '((spacemacs-light
+          (mode-line :height 0.92)
+          (mode-line-inactive :height 0.92))
+        (doom-solarized-light
+         (mode-line :height 0.92)
+         (mode-line-inactive :height 0.92))
+        (doom-gruvbox-light
+         (mode-line :height 0.80)
+         (mode-line-inactive :height 0.92))))
 
   )  ;; End of dotspacemacs/user-int
 
@@ -650,50 +680,43 @@ Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
 
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Emacs text rendering optimizations
+  ;; https://200ok.ch/posts/2020-09-29_comprehensive_guide_on_handling_long_lines_in_emacs.html
+
+  ;; Only render text left to right
+  (setq-default bidi-paragraph-direction 'left-to-right)
+
+  ;; Disable Bidirectional Parentheses Algorithm
+  (if (version<= "27.1" emacs-version)
+      (setq bidi-inhibit-bpa t))
+
+  ;; Files with known long lines
+  ;; SPC f l to open files literally to disable most text processing
+
+  ;; So long mode when Emacs thinks a file would affect performance
+  (if (version<= "27.1" emacs-version)
+      (global-so-long-mode 1))
+
+  ;; End of: Emacs text rendering optimizations
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Doom theme settings
   (setq doom-gruvbox-light-variant "hard")
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; Spaceline Doom theme settings
-  ;; https://seagle0128.github.io/doom-modeline/
   ;;
-  ;; Set height of the modeline - will resize to height of text
-  (setq doom-modeline-height 12)
-
-  ;; The left hand bar in the modeline
-  ;; setting to zero shows a large box outline
-  (setq doom-modeline-bar-width 1)
-
-  ;; Determine style of current filename / path displayed
-  ;; default: auto
-  (setq doom-modeline-buffer-file-name-style 'relative-to-project)
-
-  ;; default perspective name displayed in the mode-line.
-  (setq doom-modeline-display-default-persp-name t)
-
-  ;; Do not show buffer encoding
-  (setq doom-modeline-buffer-encoding nil)
-
-  ;; display GitHub notifications (requires `ghub' package)
-  (setq doom-modeline-github t)
-  ;; The interval of checking GitHub.
-  ;; (setq doom-modeline-github-interval (* 30 60))
-
-  ;; GNUs notifications - default t
-  (setq doom-modeline-gnus nil)
-
-  ;; IRC notifications - default t
-  (setq doom-modeline-irc nil)
-
-  ;; Environment versions - default t
-  (setq doom-modeline-env-version t)
-
-  ;; Use ascii rather than icon for modal state (more specific)
-  ;; Icon not changing for doom-solarized-light theme
-  ;; - icon changes color for doom-gruvbox-light theme
-  (setq doom-modeline-modal-icon nil)
-  ;; End of Spaceline Doom theme settings
+  (defun practicalli/setup-custom-doom-modeline ()
+    (doom-modeline-set-modeline 'practicalli-modeline 'default))
+  ;;
+  (with-eval-after-load 'doom-modeline
+    (doom-modeline-def-modeline 'practicalli-modeline
+      '(workspace-name window-number modals persp-name buffer-info remote-host vcs)
+      '(repl debug lsp process matches checker buffer-position word-count parrot selection-info misc-info))
+    (practicalli/setup-custom-doom-modeline))
+  ;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; User key bindings
@@ -702,16 +725,14 @@ before packages are loaded."
   ;; - create a new journal entry
   (spacemacs/set-leader-keys "oj" 'org-journal-new-entry)
   ;;
+  ;; Toggle workspaces forward/backwards
+  (spacemacs/set-leader-keys "ow" 'eyebrowse-next-window-config)
+  (spacemacs/set-leader-keys "oW" 'eyebrowse-last-window-config)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Over-ride Spacemacs defaults
-  ;;
-  ;; Make helm-follow-mode sticky
-  ;; scrolling through a helm list, helm-follow will preview the item.
-  ;; When C-c C-f is used with a command, helm remembers
-  (setq helm-follow-mode-persistent t)
   ;;
   ;;
   ;; Set new location for file bookmarks, SPC f b
@@ -732,14 +753,16 @@ before packages are loaded."
   (evil-global-set-key 'normal "/" 'helm-swoop)
   ;;
   ;;
+  ;; Do not highlight trailing whitespace
+  ;; - whitespace deleted on save using: dotspacemacs-whitespace-cleanup 'all
+  (setq spacemacs-show-trailing-whitespace nil)
+  ;;
+  ;;
   ;; Open ranger with the minus keybinding - not working
   ;; Currently opens with deer
   ;; (setq ranger-enter-with-minus t)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Magit - forge configuration
@@ -968,10 +991,6 @@ before packages are loaded."
   ;;              (define-key cider-repl-mode-map (kbd "RET") #'cider-repl-newline-and-indent)
   ;;              (define-key cider-repl-mode-map (kbd "C-<return>") #'cider-repl-return)))
   ;;
-  ;; TODO: Spacemacs pull request with these keybindings, updating REPL intro text with details
-  ;; You can remove this message with the <M-x cider-repl-clear-help-banner> command.
-  ;; You can disable it from appearing on start by setting
-  ;; ‘cider-repl-display-help-banner’ to nil.
   ;;
   ;; TODO: review this binding
   ;; repl history keybindings - not used - use s-<up> and s-<down> which are the defaults
@@ -1029,7 +1048,7 @@ before packages are loaded."
         (call-interactively
          (if arg 'evil-open-fold
            'evil-close-fold)))))
-
+  ;;
   (evil-define-key 'normal clojure-mode-map
     "zC" 'clojure-hack/toggle-comment-block
     "zO" (lambda () (interactive) (clojure-hack/toggle-comment-block 'open)))
@@ -1056,7 +1075,6 @@ before packages are loaded."
   ;;     (cider-jack-in)))
   ;;
   ;;
-  ;;
   ;; Hook for command-log-mode
   ;; shows keybindings & commands in separate buffer
   ;; Load command-log-mode when opening a clojure file
@@ -1070,9 +1088,6 @@ before packages are loaded."
   ;; end of clojure configuration
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Web-mode configuration
@@ -1094,14 +1109,14 @@ before packages are loaded."
   ;; Eshell visual enhancements
   ;;
   ;; Add git status visual labels
-
+  ;;
   (require 'dash)
   (require 's)
-
+  ;;
   (defmacro with-face (STR &rest PROPS)
     "Return STR propertized with PROPS."
     `(propertize ,STR 'face (list ,@PROPS)))
-
+  ;;
   (defmacro esh-section (NAME ICON FORM &rest PROPS)
     "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
     `(setq ,NAME
@@ -1109,7 +1124,7 @@ before packages are loaded."
                         (-> ,ICON
                             (concat esh-section-delim ,FORM)
                             (with-face ,@PROPS))))))
-
+  ;;
   (defun esh-acc (acc x)
     "Accumulator for evaluating and concatenating esh-sections."
     (--if-let (funcall x)
@@ -1117,20 +1132,20 @@ before packages are loaded."
             it
           (concat acc esh-sep it))
       acc))
-
+  ;;
   (defun esh-prompt-func ()
     "Build `eshell-prompt-function'"
     (concat esh-header
             (-reduce-from 'esh-acc "" eshell-funcs)
             "\n"
             eshell-prompt-string))
-
-
+  ;;
+  ;;
   ;; Looking for unicode icons on Emacs
   ;; `list-character-sets' and select unicode-bmp
   ;; scroll through bitmaps list to find the one you want
   ;; some bitmaps seem to change
-
+  ;;
   ;; "\x26A5 "  (female-male symbol)
   ;; "\xf394"   (non-binary)
   ;; "\xf105"     (docker - changes)
@@ -1154,55 +1169,54 @@ before packages are loaded."
   ;; "\xe91b"  ;  
   ;; "\xf126"    (was git fork, changes..)
   ;; "\xf1d3"  ;  (git icon - changes)
-
-
+  ;;
+  ;;
   (esh-section esh-dir
                "\xf07c"  ;  (faicon folder)
                (abbreviate-file-name (eshell/pwd))
                '(:foreground "olive" :bold bold :underline t))
-
+  ;;
   (esh-section esh-git
                "\xf397"  ;  (git branch icon)
                (magit-get-current-branch)
                '(:foreground "maroon"))
-
+  ;;
   ;; (esh-section esh-python
   ;;              "\xe928"  ;  (python icon)
   ;;              pyvenv-virtual-env-name)
-
+  ;;
   (esh-section esh-clock
                ""  ;  (clock icon)
                (format-time-string "%H:%M" (current-time))
                '(:foreground "forest green"))
-
+  ;;
   ;; Below I implement a "prompt number" section
   (setq esh-prompt-num 0)
   (add-hook 'eshell-exit-hook (lambda () (setq esh-prompt-num 0)))
   (advice-add 'eshell-send-input :before
               (lambda (&rest args) (setq esh-prompt-num (incf esh-prompt-num))))
-
-
+  ;;
+  ;;
   ;; "\xf0c9"  ;  (list icon)
   (esh-section esh-num
                "\x2130"  ;  ℰ (eshell icon)
                (number-to-string esh-prompt-num)
                '(:foreground "brown"))
-
+  ;;
   ;; Separator between esh-sections
   (setq esh-sep " ")  ; or " | "
-
+  ;;
   ;; Separator between an esh-section icon and form
   (setq esh-section-delim "")
-
+  ;;
   ;; Eshell prompt header
   (setq esh-header "\n ")  ; or "\n┌─"
-
+  ;;
   ;; Eshell prompt regexp and string. Unless you are varying the prompt by eg.
   ;; your login, these can be the same.
   (setq eshell-prompt-regexp " \x2130 ")   ; or "└─> "
   (setq eshell-prompt-string " \x2130 ")   ; or "└─> "
-
-
+  ;;
   ;; Choose which eshell-funcs to enable
   ;; (setq eshell-funcs (list esh-dir esh-git esh-python esh-clock esh-num))
   ;; (setq eshell-funcs (list esh-dir esh-git esh-clock esh-num))
@@ -1226,11 +1240,77 @@ before packages are loaded."
 
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; MacOSX
+  ;; Disable touchpad zoom gestures
+  ;;
+  ;; (define-key global-map (kbd "<magnify-up>") nil)
+  ;; (define-key global-map (kbd "<magnify-down>") nil)
+  ;;
+  ;; (defun practicalli-nothing ()
+  ;;   (interactive)
+  ;;   (message "Buttons are not toys") )
+  ;;
+  ;; (define-key global-map (kbd "<magnify-up>") 'practicalli-nothing)
+  ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+  ;; Hacking spacebind
+  ;; TODO: How to over-ride name of spacebind defined key?
+  ;; The following does not work
+  ;; (spacemacs/set-leader-keys "b C-d" 'spacemacs/kill-matching-buffers-rudely "Hackme")
+  ;; (spacemacs/set-leader-keys "b C-d" 'spacemacs/kill-matching-buffers-rudely "Hackme")
+
+  ;; (spacemacs|spacebind
+  ;;  "Encrypt / decrypt files with Easy PG"
+  ;;  :global
+  ;;  (("b" "Buffers"
+  ;;    ("C-d" spacemacs/kill-matching-buffers-rudely "Rudely"))))
+
+;; (spacemacs|spacebind
+;;  "Compare buffers, files and directories."
+;;  :global
+;;  (("TAB" spacemacs/alternate-buffer "Last buffer")
+;;   ("b" "Buffers"
+;;    ("C-e" spacemacs/kill-matching-buffers-rudely "Kill rudely..."))))
+
+
+  ;; (spacemacs|spacebind
+  ;;  "Encrypt / decrypt files with Easy PG"
+  ;;  :global
+  ;;  (("a" "applications"
+  ;;    ("g"  "easy pg"
+  ;;     ("d" epa-decrypt-file "Decrypt file to...")
+  ;;     ("D" epa-delete-keys  "Delete keys...")
+  ;;     ("e" epa-encrypt-file "Encrypt file...")
+  ;;     ("i" epa-insert-keys  "Insert keys...")
+  ;;     ("k" epa-list-keys "List keys...")
+  ;;     ("K" epa-list-secret-keys "List secret keys...")
+  ;;     ("x" epa-export-keys "Export keys...")
+  ;;     ("s"  "sign"
+  ;;      ("f" epa-sign-file "Sign file...")
+  ;;      ("m" epa-sign-mail "Sign mail...")
+  ;;      ("r" epa-sign-region "Sign region..."))
+  ;;     ("v"  "verify"
+  ;;      ("f" epa-verify-file "Verify file...")
+  ;;      ("r" epa-verify-region "Verify region...")
+  ;;      ("c" epa-verify-cleartext-in-region "Verify cleartext region..."))))))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;
+  ;; (add-hook 'persp-mode-hook
+  ;;           (lambda ()
+  ;;             (persp-load-state-from-file (expand-file-name "~/.emacs.d/.cache/layouts/persp-my-layout"))))
+  ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Configuration no longer used
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Workarounds and bug fixes - temporary hopefully
@@ -1332,6 +1412,13 @@ before packages are loaded."
   ;;                       (clj-kondo-edn . edn-joker)))
   ;;     (flycheck-add-next-checker (car checkers) (cons 'error (cdr checkers)))))
 
+
+  ;; TODO: Spacemacs pull request with these keybindings, updating REPL intro text with details
+  ;; You can remove this message with the <M-x cider-repl-clear-help-banner> command.
+  ;; You can disable it from appearing on start by setting
+  ;; ‘cider-repl-display-help-banner’ to nil.
+  ;; Cannot set the banner to another text, its hard coded in CIDER code.
+  ;; (setq cider-repl-display-help-banner "Evaluate in the source code buffer for fun and profit!")
 
 
   ;; Merged into develop
